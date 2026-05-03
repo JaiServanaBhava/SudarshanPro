@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sudarshan Pro</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            color: white; padding: 15px; margin: 0; overflow-x: hidden;
+        }
+
+        /* ── PIN Lock ── */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a1a2e 0%, #0f0f0f 100%);
+            z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .pin-display {
+            font-size: 3em; letter-spacing: 15px; margin-bottom: 30px;
+            color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.5);
+        }
+        .pin-grid { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; }
+        .pin-btn {
+            width: 80px; height: 80px; border-radius: 50%; border: 1px solid #333;
+            background: rgba(255,255,255,0.05); color: white; font-size: 1.5em;
+            backdrop-filter: blur(5px); cursor: pointer;
+        }
+        .pin-btn:active { background: #007bff; transform: scale(0.9); }
+        #pin-error { color: #ff4444; font-size: 0.85em; margin-top: 12px; height: 20px; }
+
+        /* ── Change PIN modal ── */
+        #change-pin-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 10000;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        #change-pin-modal.open { display: flex; }
+        .modal-box {
+            background: #1a1a2e; border: 1px solid #333; border-radius: 20px;
+            padding: 28px 24px; width: 310px; text-align: left;
+        }
+        .modal-box h3 { margin: 0 0 16px; color: #00ffcc; text-align: center; }
+        .modal-box input {
+            width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px;
+            border: 1px solid #333; background: #080808; color: white;
+            font-size: 1em; letter-spacing: 4px;
+        }
+        .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; font-size: 0.9em; }
+        #change-pin-msg { font-size: 0.82em; min-height: 18px; text-align: center; margin-top: 6px; }
+
+        /* ── Status bar ── */
+        #status-bar {
+            font-size: 0.85em; color: #00ffcc; margin-bottom: 10px;
+            background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px;
+            border: 1px solid rgba(0,255,204,0.2); backdrop-filter: blur(5px);
+        }
+
+        /* ── Touchpad ── */
+        #pad-container { display: flex; gap: 10px; margin: 8px 0; }
+        #pad {
+            flex-grow: 1; height: 320px;
+            background: radial-gradient(circle, #2c2c2c 0%, #1e1e1e 100%);
+            border: 2px solid #3d3d3d; border-radius: 25px;
+            touch-action: none; display: flex; align-items: center; justify-content: center;
+            color: #555; font-weight: bold; letter-spacing: 2px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        #scroll-strip {
+            width: 40px; height: 320px; background: #222; border-radius: 10px;
+            border: 1px solid #444; touch-action: none;
+            display: flex; align-items: center; justify-content: center;
+            color: #444; font-size: 1.5em; writing-mode: vertical-rl;
+        }
+        #pad:active { border-color: #007bff; }
+
+        #mouse-btns { display: flex; gap: 8px; margin: 6px 0 10px 0; }
+        #mouse-btns button { flex: 1; padding: 14px; border-radius: 12px; font-size: 0.9em; }
+        #btn-rclick { background: linear-gradient(145deg, #3a3a3a, #222); }
+        #btn-mclick { background: linear-gradient(145deg, #2a2a4a, #1a1a3a); flex: 0.5; font-size: 0.75em; padding: 14px 4px; }
+
+        #media-mode-container {
+            display: none; background: rgba(40,167,69,0.15);
+            padding: 10px; border-radius: 20px;
+            border: 1px solid rgba(40,167,69,0.3); margin: 10px 0;
+        }
+
+        .section-label {
+            font-size: 0.7em; text-transform: uppercase; color: #888;
+            text-align: left; margin: 15px 0 5px 5px; letter-spacing: 1px;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+        button {
+            padding: 16px; border-radius: 15px; border: none;
+            background: linear-gradient(145deg, #007bff, #0056b3);
+            color: white; font-weight: bold; font-size: 0.95em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s;
+            cursor: pointer;
+        }
+        button:active { transform: translateY(2px); filter: brightness(1.2); }
+        .btn-alt    { background: linear-gradient(145deg, #3a3a3a, #222); }
+        .btn-media  { background: linear-gradient(145deg, #6f42c1, #4b2c85); }
+        .btn-power  { background: linear-gradient(145deg, #dc3545, #a71d2a); }
+        .btn-green  { background: linear-gradient(145deg, #28a745, #1a6b2e); }
+        .btn-orange { background: linear-gradient(145deg, #fd7e14, #b85a00); }
+        .btn-teal   { background: linear-gradient(145deg, #0d9488, #065f46); }
+
+        .input-group {
+            margin-top: 10px; background: rgba(255,255,255,0.03);
+            padding: 15px; border-radius: 20px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%; padding: 14px; margin-bottom: 12px;
+            border-radius: 10px; border: 1px solid #333;
+            background: #080808; color: white;
+        }
+
+        #data-list {
+            max-height: 260px; overflow-y: auto; background: #000;
+            border-radius: 10px; margin-top: 10px; text-align: left;
+            padding: 10px; font-family: monospace; font-size: 0.8em;
+        }
+        .list-item {
+            padding: 8px; border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center; gap: 6px;
+        }
+
+        /* ── Stream ── */
+        #stream-container { display: none; margin-top: 10px; position: relative; }
+        #stream-img { width: 100%; border-radius: 12px; border: 2px solid #007bff; display: block; }
+        #stream-fps { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); padding: 3px 8px; border-radius: 6px; font-size: 0.75em; color: #00ffcc; }
+
+        /* ── File Browser ── */
+        #file-browser { display: none; background: #000; border-radius: 12px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
+        #fb-path { background: #111; padding: 8px 12px; font-size: 0.72em; color: #00ffcc; text-align: left; word-break: break-all; border-bottom: 1px solid #222; }
+        #fb-list { max-height: 300px; overflow-y: auto; text-align: left; }
+        .fb-item { padding: 10px 12px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .fb-item:active { background: rgba(0,123,255,0.2); }
+        .fb-item-icon { font-size: 1.2em; min-width: 22px; text-align: center; }
+        .fb-item-name { font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .fb-item-dl { color: #28a745; font-size: 0.75em; padding: 4px 10px; background: rgba(40,167,69,0.15); border-radius: 6px; white-space: nowrap; text-decoration: none; }
+        #fb-toolbar { display: flex; gap: 6px; padding: 8px; background: #111; border-bottom: 1px solid #222; flex-wrap: wrap; }
+        #fb-toolbar button { padding: 8px 12px; font-size: 0.75em; border-radius: 8px; }
+
+        #dev-footer { margin-top: 30px; padding: 14px; font-size: 0.72em; color: #444; border-top: 1px solid #1a1a1a; letter-spacing: 0.5px; }
+        #dev-footer span { color: #00ffcc; opacity: 0.7; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- ── PIN Lock Screen ── -->
+    <div id="lock-screen">
+        <div style="margin-bottom:20px; font-size:1.1em;">🔒 SUDARSHAN PRO</div>
+        <div class="pin-display" id="pin-dots">----</div>
+        <div class="pin-grid">
+            <button class="pin-btn" onclick="pressPin('1')">1</button>
+            <button class="pin-btn" onclick="pressPin('2')">2</button>
+            <button class="pin-btn" onclick="pressPin('3')">3</button>
+            <button class="pin-btn" onclick="pressPin('4')">4</button>
+            <button class="pin-btn" onclick="pressPin('5')">5</button>
+            <button class="pin-btn" onclick="pressPin('6')">6</button>
+            <button class="pin-btn" onclick="pressPin('7')">7</button>
+            <button class="pin-btn" onclick="pressPin('8')">8</button>
+            <button class="pin-btn" onclick="pressPin('9')">9</button>
+            <button class="pin-btn" style="background:transparent;border:none" onclick="clearPin()">C</button>
+            <button class="pin-btn" onclick="pressPin('0')">0</button>
+            <button class="pin-btn" style="background:transparent;border:none" onclick="clearPin()">✖</button>
+        </div>
+        <div id="pin-error"></div>
+    </div>
+
+    <!-- ── Change PIN Modal ── -->
+    <div id="change-pin-modal">
+        <div class="modal-box">
+            <h3>🔑 Change PIN</h3>
+            <input type="password" id="cp-old" placeholder="Current PIN" maxlength="8" inputmode="numeric">
+            <input type="password" id="cp-new" placeholder="New PIN (4+ digits)" maxlength="8" inputmode="numeric">
+            <input type="password" id="cp-confirm" placeholder="Confirm New PIN" maxlength="8" inputmode="numeric">
+            <div class="modal-btns">
+                <button class="btn-alt" onclick="closePinModal()">Cancel</button>
+                <button class="btn-green" onclick="submitPinChange()">Save PIN</button>
+            </div>
+            <div id="change-pin-msg"></div>
+        </div>
+    </div>
+
+    <!-- ── Status Bar ── -->
+    <div id="status-bar">Connecting to PC...</div>
+
+    <!-- ── Touchpad ── -->
+    <div id="pad-container">
+        <div id="pad">TOUCHPAD</div>
+        <div id="scroll-strip">SCROLL</div>
+    </div>
+
+    <!-- ── Mouse Buttons ── -->
+    <div id="mouse-btns">
+        <button onclick="doLeftClick()">🖱️ Left Click</button>
+        <button id="btn-mclick" onclick="doMiddleClick()">⚙️ Mid</button>
+        <button id="btn-rclick" onclick="doRightClick()">🖱️ Right Click</button>
+    </div>
+
+    <!-- ── Media Mode ── -->
+    <div id="media-mode-container">
+        <div class="section-label" style="color:#28a745;">Active Media: <span id="active-app-name">None</span></div>
+        <div class="grid grid-3">
+            <button class="btn-media" onclick="api('media',{action:'prevtrack'})">⏮️</button>
+            <button class="btn-media" onclick="api('media',{action:'playpause'})">⏯️</button>
+            <button class="btn-media" onclick="api('media',{action:'nexttrack'})">⏭️</button>
+        </div>
+    </div>
+
+    <!-- ── Controls ── -->
+    <div class="section-label">Controls</div>
+    <div class="grid">
+        <button onclick="api('volume',{action:'up'})">🔊 Vol Up</button>
+        <button onclick="api('volume',{action:'down'})">🔉 Vol Down</button>
+        <button onclick="api('brightness',{action:'up'})">☀️ Bright +</button>
+        <button onclick="api('brightness',{action:'down'})">🌙 Bright -</button>
+    </div>
+
+    <!-- ── Text / Clipboard ── -->
+    <div class="input-group">
+        <input type="text" id="textInput" placeholder="Type text or message...">
+        <div class="grid">
+            <button onclick="typeText()">⌨️ Send Type</button>
+            <button class="btn-alt" onclick="sendMsg()">💬 Pop-up</button>
+            <button onclick="copyToPC()">📋 Paste to PC</button>
+            <button class="btn-alt" onclick="getFromPC()">📂 Get Clip</button>
+        </div>
+    </div>
+
+    <!-- ── Advanced Commands ── -->
+    <div class="section-label">Advanced Commands</div>
+    <div class="input-group">
+        <input type="text" id="cmdInput" placeholder="Enter command, alert text, or search...">
+        <div class="grid">
+            <button class="btn-alt" onclick="runTerminal()">🖥️ Run Cmd</button>
+            <button onclick="sendAlert()">🚨 Show Alert</button>
+            <button onclick="pcSpeak()">🔊 PC Speak</button>
+            <button class="btn-orange" onclick="lockWorkstation()">🔒 Lock PC</button>
+        </div>
+        <div id="data-list">Output / File list will appear here...</div>
+    </div>
+
+    <!-- ── Explorer & File Browser ── -->
+    <div class="section-label">Explorer & Manager</div>
+    <div class="grid">
+        <button class="btn-alt" onclick="openFileBrowser()">📂 File Browser</button>
+        <button class="btn-alt" onclick="fetchProcs()">📋 Processes</button>
+    </div>
+    <div id="file-browser">
+        <div id="fb-toolbar">
+            <button class="btn-alt" onclick="fbGoUp()">⬆️ Up</button>
+            <button class="btn-alt" onclick="fbGoHome()">🏠 Home</button>
+            <button class="btn-alt" onclick="fbGoDesktop()">🖥️ Desktop</button>
+            <button class="btn-alt" onclick="fbRefresh()">🔄 Refresh</button>
+        </div>
+        <div id="fb-path">...</div>
+        <div id="fb-list"><div style="padding:12px;color:#555;">Loading...</div></div>
+    </div>
+
+    <!-- ── System ── -->
+    <div class="section-label">System</div>
+    <div class="grid">
+        <button class="btn-alt" onclick="api('system',{cmd:'minimize'})">🏠 Desktop</button>
+        <button class="btn-alt" onclick="api('system',{cmd:'taskmgr'})">📊 Task Mgr</button>
+        <button class="btn-power" onclick="confirm('Sleep?') && api('power',{action:'sleep'})">💤 Sleep</button>
+        <button class="btn-power" onclick="confirm('Shutdown?') && api('power',{action:'shutdown'})">🛑 Power Off</button>
+    </div>
+
+    <!-- ── Security ── -->
+    <div class="section-label">Security</div>
+    <div class="grid">
+        <button class="btn-teal" onclick="openPinModal()">🔑 Change PIN</button>
+        <button class="btn-alt" onclick="api('system',{cmd:'lock'})">🔒 Lock PC</button>
+    </div>
+
+    <!-- ── Remote Monitor ── -->
+    <div class="section-label">🕵️ Remote Monitor</div>
+    <div class="grid">
+        <button class="btn-alt" onclick="takePhoto()">📸 Snap Photo</button>
+        <button class="btn-alt" onclick="recordAudio()">🎙️ Record Audio</button>
+    </div>
+
+    <!-- ── Screenshot ── -->
+    <div class="section-label">📸 Screenshot</div>
+    <div class="grid">
+        <button class="btn-alt" onclick="takeScreenshot()">📸 Snap Screen</button>
+        <button class="btn-alt" onclick="viewLastScreenshot()">🖼️ View Last</button>
+    </div>
+    <div id="screenshot-preview" style="margin-top:10px;display:none;">
+        <img id="screenshot-img" style="width:100%;border-radius:10px;border:1px solid #333;" />
+    </div>
+
+    <!-- ── Live Screen Stream ── -->
+    <div class="section-label">📡 Live Screen Stream</div>
+    <div class="grid">
+        <button class="btn-green" id="stream-toggle-btn" onclick="toggleStream()">▶️ Start Stream</button>
+        <button class="btn-alt" onclick="changeStreamQuality()">⚙️ Quality</button>
+    </div>
+    <div id="stream-container">
+        <img id="stream-img" src="" alt="Live Stream" />
+        <div id="stream-fps">-- FPS</div>
+    </div>
+
+    <!-- ── Now Playing ── -->
+    <div class="section-label">🎵 Now Playing</div>
+    <button class="btn-alt" onclick="viewNowPlaying()" style="width:100%;margin-top:8px;">🎵 Check Now Playing</button>
+    <div id="now-playing-out" style="display:none;color:#00ffcc;font-size:0.85em;margin-top:6px;padding:8px;background:#000;border-radius:8px;text-align:left;"></div>
+
+    <!-- ── Sticky Note & URL ── -->
+    <div class="section-label">📝 Sticky Note & URL</div>
+    <div class="input-group">
+        <input type="text" id="noteInput" placeholder="Type note or URL...">
+        <div class="grid">
+            <button onclick="sendStickyNote()">📝 Save Note</button>
+            <button class="btn-alt" onclick="pushUrl()">🌐 Open in Chrome</button>
+        </div>
+    </div>
+
+    <!-- ── Monitor & Wallpaper ── -->
+    <div class="section-label">🖥️ Monitor & Wallpaper</div>
+    <div class="grid">
+        <button class="btn-alt" onclick="api('monitor',{action:'off'})">🌑 Monitor Off</button>
+        <button class="btn-alt" onclick="api('monitor',{action:'on'})">💡 Monitor On</button>
+        <button onclick="setWallpaper()">🖼️ Rnd Wallpaper</button>
+        <button class="btn-alt" onclick="showNetSpeed()">📶 Net Speed</button>
+    </div>
+    <div id="net-speed-out" style="display:none;color:#00ffcc;font-size:0.85em;margin-top:6px;"></div>
+
+    <!-- ── Upload File to PC ── -->
+    <div class="section-label">📤 Upload File to PC</div>
+    <div class="input-group">
+        <input type="file" id="fileUploadInput" style="width:100%;color:white;margin-bottom:10px;padding:10px;border-radius:10px;border:1px solid #333;background:#080808;">
+        <button onclick="uploadFileToPC()" style="width:100%;">📤 Upload to DropZone</button>
+    </div>
+
+    <!-- ── Drop Zone ── -->
+    <div class="section-label">📥 File Drop Zone</div>
+    <div id="drop-zone-list" class="input-group" style="text-align:left;max-height:220px;overflow-y:auto;margin-top:0;">
+        <p style="color:#666;font-size:0.8em;">Drag files into the 'DropZone' folder on your PC Desktop...</p>
+    </div>
+
+    <!-- ── App Launcher ── -->
+    <div class="section-label">🚀 App Launcher</div>
+    <div class="input-group" style="padding:10px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="text" id="appSearch" placeholder="Search apps..." style="flex:1;margin:0;" oninput="filterApps(this.value)">
+            <button onclick="loadApps()" style="padding:10px 14px;font-size:0.85em;flex-shrink:0;">🔄</button>
+        </div>
+        <div id="app-list" style="max-height:240px;overflow-y:auto;text-align:left;">
+            <div style="color:#666;font-size:0.8em;padding:8px;">Tap 🔄 to load installed apps</div>
+        </div>
+    </div>
+
+    <div id="dev-footer">
+        Developed by <span>Jai Servana Bhava</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         SCRIPTS
+         ════════════════════════════════════════════ -->
+    <script>
+        // ── Core ────────────────────────────────────
+        let lastX, lastY, lastScrollY, lastMoveTime = 0;
+        let currentPin = "";
+
+        const pad         = document.getElementById('pad');
+        const scrollStrip = document.getElementById('scroll-strip');
+        const status      = document.getElementById('status-bar');
+        const dataList    = document.getElementById('data-list');
+
+        function vibrate(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+        // ── PIN (server-validated, persisted) ───────
+        async function pressPin(num) {
+            if (currentPin.length >= 8) return;
+            currentPin += num;
+            updatePinDisp();
+            vibrate(30);
+            if (currentPin.length >= 4) {
+                // Give user a tiny moment to see stars, then validate
+                await new Promise(r => setTimeout(r, 180));
+                const res = await fetch('/get_pin_check', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({pin: currentPin})
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    vibrate(100);
+                    document.getElementById('lock-screen').style.display = 'none';
+                } else {
+                    vibrate([50, 30, 50]);
+                    document.getElementById('pin-error').innerText = 'Wrong PIN — try again';
+                    currentPin = "";
+                    updatePinDisp();
+                    setTimeout(() => document.getElementById('pin-error').innerText = '', 1800);
+                }
+            }
+        }
+        function updatePinDisp() {
+            document.getElementById('pin-dots').innerText = "●".repeat(currentPin.length).padEnd(4, '–');
+        }
+        function clearPin() { currentPin = ""; updatePinDisp(); }
+
+        // ── Change PIN modal ─────────────────────────
+        function openPinModal() {
+            document.getElementById('change-pin-modal').classList.add('open');
+            document.getElementById('cp-old').value = '';
+            document.getElementById('cp-new').value = '';
+            document.getElementById('cp-confirm').value = '';
+            document.getElementById('change-pin-msg').innerText = '';
+        }
+        function closePinModal() {
+            document.getElementById('change-pin-modal').classList.remove('open');
+        }
+        async function submitPinChange() {
+            const oldPin  = document.getElementById('cp-old').value.trim();
+            const newPin  = document.getElementById('cp-new').value.trim();
+            const confirm = document.getElementById('cp-confirm').value.trim();
+            const msg     = document.getElementById('change-pin-msg');
+            if (!oldPin || !newPin) { msg.style.color='#f66'; msg.innerText='Fill all fields'; return; }
+            if (newPin !== confirm)  { msg.style.color='#f66'; msg.innerText='PINs do not match'; return; }
+            if (!/^\d{4,8}$/.test(newPin)) { msg.style.color='#f66'; msg.innerText='PIN must be 4–8 digits'; return; }
+            const res = await fetch('/change_pin', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({old_pin: oldPin, new_pin: newPin})
+            });
+            const data = await res.json();
+            if (data.status) {
+                msg.style.color = '#0f0'; msg.innerText = '✅ ' + data.status;
+                setTimeout(closePinModal, 1500);
+            } else {
+                msg.style.color = '#f66'; msg.innerText = '❌ ' + (data.error || 'Error');
+            }
+        }
+
+        // ── API helper ───────────────────────────────
+        async function api(path, data) {
+            try {
+                return await fetch('/' + path, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+            } catch (err) { console.error("Request failed", err); }
+        }
+
+        // ── Touchpad ─────────────────────────────────
+        pad.addEventListener('touchstart', e => { vibrate(20); lastX = e.touches[0].pageX; lastY = e.touches[0].pageY; });
+        pad.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const now = Date.now();
+            if (now - lastMoveTime < 25) return;   // ~40fps — faster than before
+            if (e.touches.length === 1) {
+                const dx = (e.touches[0].pageX - lastX) * 2.5;
+                const dy = (e.touches[0].pageY - lastY) * 2.5;
+                api('mouse', {type:'move', dx:Math.round(dx), dy:Math.round(dy)});
+            } else if (e.touches.length === 2) {
+                const dy = e.touches[0].pageY - lastY;
+                api('mouse', {type:'scroll', amount: dy > 0 ? -80 : 80});
+            }
+            lastX = e.touches[0].pageX; lastY = e.touches[0].pageY; lastMoveTime = now;
+        }, {passive: false});
+        pad.addEventListener('click', () => { vibrate(40); api('mouse', {type:'click'}); });
+
+        // ── Scroll Strip ─────────────────────────────
+        scrollStrip.addEventListener('touchstart', e => { lastScrollY = e.touches[0].pageY; });
+        scrollStrip.addEventListener('touchmove', e => {
+            const dy = e.touches[0].pageY - lastScrollY;
+            if (Math.abs(dy) > 10) { api('mouse', {type:'scroll', amount: dy > 0 ? -100 : 100}); lastScrollY = e.touches[0].pageY; }
+        });
+
+        // ── Mouse Buttons ────────────────────────────
+        function doLeftClick()  { vibrate(40); api('mouse', {type:'click'}); }
+        function doRightClick() { vibrate(40); api('mouse', {type:'right_click'}); }
+        function doMiddleClick(){ vibrate(30); api('mouse', {type:'middle_click'}); }
+
+        // ── Commands ─────────────────────────────────
+        async function runTerminal() {
+            const res = await api('terminal', {cmd: document.getElementById('cmdInput').value});
+            if (res) { const data = await res.json(); dataList.innerText = data.output; }
+        }
+        function sendAlert() {
+            const msg = document.getElementById('cmdInput').value.trim() || document.getElementById('textInput').value.trim();
+            api('alert', {text: msg || "System Alert!"});
+            document.getElementById('cmdInput').value = ""; vibrate(50);
+        }
+        async function pcSpeak() {
+            const msg = document.getElementById('cmdInput').value.trim() || document.getElementById('textInput').value.trim();
+            await api('speak', {text: msg || "Hello from your phone!"});
+            document.getElementById('cmdInput').value = ""; vibrate(50);
+        }
+        function lockWorkstation() { vibrate(80); api('system', {cmd:'lock'}); }
+
+        // ── Text / Clipboard ─────────────────────────
+        function typeText()  { api('keyboard', {text: document.getElementById('textInput').value}); document.getElementById('textInput').value = ''; }
+        function sendMsg()   { api('system', {cmd:'message', text: document.getElementById('textInput').value}); }
+        function copyToPC()  { api('clipboard', {text: document.getElementById('textInput').value}); }
+        async function getFromPC() { const res = await fetch('/clipboard'); const d = await res.json(); document.getElementById('textInput').value = d.text; }
+
+        // ── Processes ────────────────────────────────
+        async function fetchProcs() {
+            const res = await fetch('/processes');
+            const data = await res.json();
+            dataList.innerHTML = data.map(p =>
+                `<div class="list-item">${p.name}
+                 <button onclick="api('kill_proc',{pid:${p.pid}})" style="padding:4px 8px;font-size:0.7em;background:#dc3545;border-radius:6px;">Kill</button>
+                 </div>`
+            ).join('');
+        }
+
+        // ── Status Poll (every 4s — faster than before) ──
+        setInterval(async () => {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                const chg = data.charging ? ' ⚡' : '';
+                status.innerText = `${data.os} | 🔋${data.battery}${chg} | CPU ${data.cpu}% | RAM ${data.ram}%`;
+                const appRes = await fetch('/app_status');
+                const appData = await appRes.json();
+                const mc = document.getElementById('media-mode-container');
+                mc.style.display = (appData.active && appData.active.length > 0) ? 'block' : 'none';
+                if (appData.active) document.getElementById('active-app-name').innerText = appData.active.join(', ');
+            } catch (e) { status.innerText = "⚠️ Offline — reconnecting..."; }
+        }, 4000);
+    </script>
+
+    <!-- Drop Zone -->
+    <script>
+        async function refreshDropZone() {
+            try {
+                const res = await fetch('/get_drops');
+                const data = await res.json();
+                const list = document.getElementById('drop-zone-list');
+                if (data.files && data.files.length > 0) {
+                    list.innerHTML = data.files.map(file => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #333;">
+                            <span style="font-size:0.88em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%;">${file}</span>
+                            <a href="/download_drop/${encodeURIComponent(file)}" download
+                               style="background:#28a745;color:white;padding:4px 10px;border-radius:5px;text-decoration:none;font-size:0.8em;">⬇ Download</a>
+                        </div>`).join('');
+                } else {
+                    list.innerHTML = '<p style="color:#666;font-size:0.8em;">Folder is empty.</p>';
+                }
+            } catch (e) { console.error("Dropzone Error:", e); }
+        }
+        setInterval(refreshDropZone, 6000);
+        refreshDropZone();
+    </script>
+
+    <!-- Remote Monitor -->
+    <script>
+        async function takePhoto() {
+            vibrate(50);
+            status.innerText = "📷 Capturing photo...";
+            const res = await fetch('/capture_cam', {method:'POST'});
+            const data = await res.json();
+            if (data.status === "success") {
+                refreshDropZone();
+                alert("📷 Photo saved to Drop Zone!");
+            } else {
+                alert("Camera Error: " + (data.error || "Unknown error") +
+                      "\n\nTip: Install opencv-python before building for best camera support.");
+            }
+            status.innerText = ""; status.style.color = "#00ffcc";
+        }
+        async function recordAudio() {
+            vibrate(50);
+            // Ask user how long to record
+            const secsInput = prompt("🎙️ Record audio\n\nHow many seconds? (3–120, default 30)", "30");
+            if (secsInput === null) return;  // user cancelled
+            const secs = Math.max(3, Math.min(120, parseInt(secsInput) || 30));
+            const orig = status.innerText;
+            status.innerText = `🔴 RECORDING ${secs}s AUDIO...`;
+            status.style.color = "#ff4444";
+            const res = await fetch('/record_audio', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({duration: secs})
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                refreshDropZone();
+                alert(`✅ Audio (${data.duration_seconds}s) saved to Drop Zone!`);
+            } else {
+                alert("Audio Error: " + (data.error || "Unknown error"));
+            }
+            status.innerText = orig; status.style.color = "#00ffcc";
+        }
+    </script>
+
+    <!-- Screenshot -->
+    <script>
+        let lastScreenFile = null;
+        async function takeScreenshot() {
+            vibrate(40);
+            const res = await fetch('/screenshot', {method:'POST'});
+            const data = await res.json();
+            if (data.status === 'success') { lastScreenFile = data.file; alert('Screenshot saved: ' + data.file); refreshDropZone(); }
+            else alert('Error: ' + data.error);
+        }
+        function viewLastScreenshot() {
+            if (!lastScreenFile) { alert('Take a screenshot first!'); return; }
+            const prev = document.getElementById('screenshot-preview');
+            document.getElementById('screenshot-img').src = '/screenshot_view/' + lastScreenFile + '?t=' + Date.now();
+            prev.style.display = prev.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+
+    <!-- Live Screen Stream -->
+    <script>
+        let streamActive = false, streamTimer = null, streamQuality = 35;
+        let streamFpsCounter = 0, streamFpsTime = Date.now();
+
+        function toggleStream() { streamActive ? stopStream() : startStream(); }
+        function startStream() {
+            streamActive = true;
+            document.getElementById('stream-container').style.display = 'block';
+            document.getElementById('stream-toggle-btn').innerHTML = '⏹️ Stop Stream';
+            document.getElementById('stream-toggle-btn').className = 'btn-power';
+            fetchStreamFrame();
+        }
+        function stopStream() {
+            streamActive = false;
+            if (streamTimer) clearTimeout(streamTimer);
+            document.getElementById('stream-toggle-btn').innerHTML = '▶️ Start Stream';
+            document.getElementById('stream-toggle-btn').className = 'btn-green';
+            document.getElementById('stream-container').style.display = 'none';
+        }
+        async function fetchStreamFrame() {
+            if (!streamActive) return;
+            try {
+                const res = await fetch('/stream_frame?q=' + streamQuality);
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const img = document.getElementById('stream-img');
+                const old = img.src;
+                img.src = url;
+                img.onload = () => { if (old && old.startsWith('blob:')) URL.revokeObjectURL(old); };
+                streamFpsCounter++;
+                const now = Date.now();
+                if (now - streamFpsTime >= 1000) {
+                    document.getElementById('stream-fps').innerText = streamFpsCounter + ' FPS';
+                    streamFpsCounter = 0; streamFpsTime = now;
+                }
+            } catch(e) { console.error('Stream error', e); }
+            if (streamActive) streamTimer = setTimeout(fetchStreamFrame, 180); // ~5.5fps max
+        }
+        function changeStreamQuality() {
+            const q = prompt('Quality: 10=fast/low, 80=slow/high\nCurrent: ' + streamQuality, streamQuality);
+            if (q && !isNaN(q)) streamQuality = Math.max(5, Math.min(95, parseInt(q)));
+        }
+    </script>
+
+    <!-- Now Playing -->
+    <script>
+        async function viewNowPlaying() {
+            const res = await fetch('/now_playing');
+            const data = await res.json();
+            const el = document.getElementById('now-playing-out');
+            el.style.display = 'block';
+            el.innerHTML = '<b>Now Playing:</b> ' + (data.title || 'Nothing detected');
+        }
+    </script>
+
+    <!-- Sticky / URL / Wallpaper / NetSpeed / Upload -->
+    <script>
+        function sendStickyNote() {
+            const text = document.getElementById('noteInput').value.trim();
+            if (!text) { alert('Type something first'); return; }
+            fetch('/sticky_note', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text})})
+                .then(r => r.json()).then(d => { alert(d.status || d.error); document.getElementById('noteInput').value = ''; });
+        }
+        function pushUrl() {
+            const url = document.getElementById('noteInput').value.trim();
+            if (!url) { alert('Enter a URL first'); return; }
+            fetch('/push_url', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url})})
+                .then(r => r.json()).then(d => { alert(d.status || d.error); document.getElementById('noteInput').value = ''; });
+        }
+        function setWallpaper() {
+            const folder = prompt('Pictures folder path (blank = ~/Pictures):') || '';
+            fetch('/wallpaper', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(folder ? {folder} : {})})
+                .then(r => r.json()).then(d => alert(d.status || d.error));
+        }
+        async function showNetSpeed() {
+            const el = document.getElementById('net-speed-out');
+            el.style.display = 'block'; el.innerText = 'Measuring...';
+            await new Promise(r => setTimeout(r, 1000));
+            const res = await fetch('/network_speed');
+            const data = await res.json();
+            el.innerText = data.error ? 'Error' : '↑ ' + data.upload + '   ↓ ' + data.download;
+        }
+        async function uploadFileToPC() {
+            const input = document.getElementById('fileUploadInput');
+            if (!input.files.length) { alert('Select a file first'); return; }
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+            const res = await fetch('/upload_to_dropzone', {method:'POST', body: formData});
+            const data = await res.json();
+            alert(data.status || data.error);
+            refreshDropZone();
+        }
+    </script>
+
+    <!-- Full File Browser -->
+    <script>
+        let fbCurrentPath = '';
+        function openFileBrowser() {
+            const fb = document.getElementById('file-browser');
+            if (fb.style.display === 'block') { fb.style.display = 'none'; return; }
+            fb.style.display = 'block'; fbLoadPath('');
+        }
+        async function fbLoadPath(path) {
+            document.getElementById('fb-list').innerHTML = '<div style="padding:12px;color:#555;">Loading...</div>';
+            try {
+                const res = await fetch('/browse?path=' + encodeURIComponent(path));
+                const data = await res.json();
+                if (data.error) { document.getElementById('fb-list').innerHTML = '<div style="padding:12px;color:#f66;">' + data.error + '</div>'; return; }
+                fbCurrentPath = data.path;
+                document.getElementById('fb-path').innerText = data.path;
+                const items = data.items || [];
+                if (!items.length) { document.getElementById('fb-list').innerHTML = '<div style="padding:12px;color:#555;">Empty folder</div>'; return; }
+                document.getElementById('fb-list').innerHTML = items.map(item => {
+                    const icon = item.is_dir ? '📁' : getFileIcon(item.name);
+                    const size = (!item.is_dir && item.size) ? formatBytes(item.size) : '';
+                    const dlBtn = !item.is_dir
+                        ? `<a href="/download_file?path=${encodeURIComponent(item.full_path)}" download class="fb-item-dl">⬇</a>`
+                        : '<span style="color:#555;font-size:0.75em;">▶</span>';
+                    return `<div class="fb-item" data-path="${encodeURIComponent(item.full_path)}" data-isdir="${item.is_dir}">
+                        <span class="fb-item-icon">${icon}</span>
+                        <span class="fb-item-name">${item.name}</span>
+                        <span style="font-size:0.7em;color:#555;white-space:nowrap;min-width:36px;text-align:right;">${size}</span>
+                        ${dlBtn}
+                    </div>`;
+                }).join('');
+                document.querySelectorAll('.fb-item').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        if (e.target.tagName === 'A') return;
+                        if (this.dataset.isdir === 'true') fbLoadPath(decodeURIComponent(this.dataset.path));
+                    });
+                });
+            } catch(e) { document.getElementById('fb-list').innerHTML = '<div style="padding:12px;color:#f66;">Error: ' + e.message + '</div>'; }
+        }
+        function fbGoUp() {
+            if (!fbCurrentPath) return;
+            const sep = fbCurrentPath.includes('\\') ? '\\' : '/';
+            const parts = fbCurrentPath.split(sep).filter(Boolean);
+            parts.pop();
+            const parent = parts.length ? (sep === '\\' ? parts.join('\\') : '/' + parts.join('/')) : '';
+            fbLoadPath(parent);
+        }
+        function fbGoHome() { fbLoadPath(''); }
+        async function fbGoDesktop() { const res = await fetch('/browse_desktop'); const d = await res.json(); if (d.path) fbLoadPath(d.path); }
+        function fbRefresh() { fbLoadPath(fbCurrentPath); }
+        function getFileIcon(name) {
+            const ext = (name.split('.').pop() || '').toLowerCase();
+            return {mp4:'🎬',mkv:'🎬',avi:'🎬',mov:'🎬',mp3:'🎵',wav:'🎵',flac:'🎵',
+                    jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️',bmp:'🖼️',webp:'🖼️',
+                    pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📑',pptx:'📑',
+                    zip:'🗜️',rar:'🗜️','7z':'🗜️',tar:'🗜️',gz:'🗜️',
+                    exe:'⚙️',msi:'⚙️',bat:'⚙️',txt:'📃',log:'📃',
+                    py:'🐍',js:'📜',html:'🌐',css:'🎨',json:'📋',xml:'📋'}[ext] || '📄';
+        }
+        function formatBytes(b) {
+            if (b > 1e9) return (b/1e9).toFixed(1)+'GB';
+            if (b > 1e6) return (b/1e6).toFixed(1)+'MB';
+            if (b > 1e3) return Math.round(b/1e3)+'KB';
+            return b+'B';
+        }
+    </script>
+
+    <!-- App Launcher -->
+    <script>
+        let allApps = [];
+        async function loadApps() {
+            const el = document.getElementById('app-list');
+            el.innerHTML = '<div style="color:#00ffcc;font-size:0.8em;padding:8px;">Loading apps...</div>';
+            try {
+                const res = await fetch('/installed_apps');
+                const data = await res.json();
+                allApps = data.apps || [];
+                renderApps(allApps);
+            } catch(e) { el.innerHTML = '<div style="color:#f66;font-size:0.8em;padding:8px;">Error loading apps</div>'; }
+        }
+        function renderApps(list) {
+            const el = document.getElementById('app-list');
+            if (!list.length) { el.innerHTML = '<div style="color:#666;font-size:0.8em;padding:8px;">No apps found</div>'; return; }
+            el.innerHTML = list.map(a => {
+                const emoji = getAppEmoji(a.name);
+                const idx = allApps.indexOf(a);
+                return `<div class="app-item" data-idx="${idx}"
+                    style="display:flex;align-items:center;gap:10px;padding:9px 8px;border-bottom:1px solid #1a1a1a;cursor:pointer;border-radius:8px;">
+                    <span style="font-size:1.3em;min-width:24px;text-align:center;">${emoji}</span>
+                    <span style="font-size:0.88em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</span>
+                </div>`;
+            }).join('');
+            el.querySelectorAll('.app-item').forEach(div => {
+                div.addEventListener('click', function() {
+                    const a = allApps[parseInt(this.dataset.idx)];
+                    if (a) launchInstalledApp(a.path, a.type || 'lnk');
+                });
+            });
+        }
+        function filterApps(q) {
+            if (!allApps.length) return;
+            renderApps(q ? allApps.filter(a => a.name.toLowerCase().includes(q.toLowerCase())) : allApps);
+        }
+        function getAppEmoji(name) {
+            const n = name.toLowerCase();
+            if (n.includes('chrome'))     return '🌐'; if (n.includes('firefox'))   return '🦊';
+            if (n.includes('edge'))       return '🔵'; if (n.includes('spotify'))   return '🎵';
+            if (n.includes('vlc'))        return '🎬'; if (n.includes('code')||n.includes('vscode')) return '💻';
+            if (n.includes('word'))       return '📝'; if (n.includes('excel'))     return '📊';
+            if (n.includes('powerpoint')) return '📑'; if (n.includes('notepad'))   return '📄';
+            if (n.includes('steam'))      return '🎮'; if (n.includes('discord'))   return '💬';
+            if (n.includes('whatsapp'))   return '💬'; if (n.includes('zoom'))      return '📹';
+            if (n.includes('teams'))      return '👥'; if (n.includes('paint'))     return '🎨';
+            if (n.includes('camera'))     return '📷'; if (n.includes('calculator'))return '🔢';
+            if (n.includes('settings'))   return '⚙️'; if (n.includes('explorer'))  return '📂';
+            if (n.includes('terminal')||n.includes('cmd')||n.includes('powershell')) return '⌨️';
+            if (n.includes('outlook')||n.includes('mail')) return '📧';
+            if (n.includes('obs'))        return '🔴'; if (n.includes('audacity'))  return '🎙️';
+            if (n.includes('photoshop'))  return '🖼️'; if (n.includes('winrar')||n.includes('7-zip')) return '🗜️';
+            return '🔷';
+        }
+        function launchInstalledApp(path, type) {
+            vibrate(30);
+            fetch('/launch_app_path', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({path, type})})
+                .then(r => r.json()).then(d => { if(d.error) alert('Launch error: ' + d.error); });
+        }
+    </script>
+
+</body>
+</html>
