@@ -73,13 +73,11 @@ Traditional remote desktop tools are often heavy, laggy, or require complex port
     </tr>
     <tr>
   <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/1.jpeg" alt="Dashboard" width="250"></td>
-  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/4.jpeg" alt="Dashboard" width="250"></td>
-      
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/4.jpeg" alt="Dashboard" width="250"></td>      
     </tr>
      <tr>
   <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/5.jpeg" alt="Dashboard" width="250"></td>
-  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/6.jpeg" alt="Dashboard" width="250"></td>
-      
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/6.jpeg" alt="Dashboard" width="250"></td>   
     </tr>
   </table>
 </div>
