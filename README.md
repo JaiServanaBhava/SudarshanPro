@@ -68,12 +68,18 @@ Traditional remote desktop tools are often heavy, laggy, or require complex port
 <div align="center">
   <table style="border: none;">
     <tr>
-      <td><img src="YOUR_DASHBOARD_URL_HERE" alt="Dashboard" width="250"></td>
-      <td><img src="YOUR_REMOTE_VIEW_URL_HERE" alt="Remote View" width="250"></td>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/3.jpeg" alt="Dashboard" width="250"></td>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/2.jpeg" alt="Remote View" width="250"></td>
     </tr>
     <tr>
-      <td align="center"><b>Mobile Dashboard</b></td>
-      <td align="center"><b>Surveillance View</b></td>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/1.jpeg" alt="Dashboard" width="250"></td>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/4.jpeg" alt="Dashboard" width="250"></td>
+      
+    </tr>
+     <tr>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/5.jpeg" alt="Dashboard" width="250"></td>
+  <td><img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/screenshots/6.jpeg" alt="Dashboard" width="250"></td>
+      
     </tr>
   </table>
 </div>
