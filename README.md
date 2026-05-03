@@ -1,61 +1,92 @@
 <div align="center">
-  <!-- Use the logo link you mentioned here -->
-  <img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/icon.png" alt="Sudarshan Pro Logo" width="200">
-
+  <img src="https://github.com/JaiServanaBhava/SudarshanPro/blob/main/icon.png?raw=true" alt="Sudarshan Pro Logo" width="160">
   <h1>Sudarshan Pro</h1>
-
-  <p><b>A powerful, lightweight Python-based Remote PC Controller & Surveillance System.</b></p>
-
-  <p>
-    <img src="https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python" alt="Python">
-    <img src="https://img.shields.io/badge/Framework-Flask-lightgrey?style=for-the-badge&logo=flask" alt="Flask">
-    <img src="https://img.shields.io/badge/UI-Modern_Glassmorphism-brightgreen?style=for-the-badge" alt="UI">
-    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
+  <p align="center">
+    <b>The Ultimate Zero-Config Remote PC Control & Surveillance Suite</b>
+    <br />
+    <i>Control your world from your pocket. Fast. Secure. Professional.</i>
   </p>
+
+  <p align="center">
+    <img src="https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+    <img src="https://img.shields.io/badge/Framework-Flask-black?style=for-the-badge&logo=flask" alt="Flask">
+    <img src="https://img.shields.io/badge/Architecture-Async_Threaded-orange?style=for-the-badge" alt="Async">
+    <img src="https://img.shields.io/badge/UI-Glassmorphism-brightgreen?style=for-the-badge" alt="UI">
+  </p>
+
+  <a href="https://drive.google.com/file/d/1PtmbLT0mRky7qzX1UMUDUjovTk7V5yRV/view?usp=sharing">
+    <img src="https://img.shields.io/badge/DOWNLOAD-SUDARSHAN_PRO_EXE-blueviolet?style=for-the-badge&logo=google-drive&logoColor=white" alt="Download EXE">
+  </a>
+
+  <h4>
+    <a href="#-key-advantages">Advantages</a> •
+    <a href="#-feature-suite">Features</a> •
+    <a href="#-installation">Installation</a> •
+    <a href="#-tech-stack">Tech Stack</a>
+  </h4>
 </div>
 
 ---
 
-## 🚀 Overview
+## 🌟 Why Sudarshan Pro?
 
-**Sudarshan Pro** is an all-in-one remote management tool that transforms your smartphone into a sophisticated remote control for your PC. It features a modern web interface accessible via a QR code, allowing for seamless system control, file management, and real-time monitoring over the same Wi-Fi network.
+Traditional remote desktop tools are often heavy, laggy, or require complex port forwarding. **Sudarshan Pro** is built for speed and absolute simplicity. Whether you need to monitor your system, transfer files instantly, or control your media from across the room, it offers a professional-grade experience in a lightweight package.
 
-## ✨ Features
+### 💎 Key Advantages
+*   **Zero Setup:** No mobile app installation required. Simply scan the auto-generated QR code to begin.
+*   **Ultra Lightweight:** Consumes minimal RAM and CPU while maintaining a high-performance background connection.
+*   **Privacy First:** All data remains on your local network. No third-party servers or external cloud dependencies.
+*   **Bi-Directional Utility:** Beyond simple mouse control, it acts as a full-system bridge for file management and surveillance.
+*   **100% Portable:** Run it anywhere as a single `.exe` file without needing Python installed on the host machine.[cite: 1, 2]
 
-*   **📱 Remote Input:** Full mouse and keyboard control (click, scroll, type) via smartphone.
-*   **📸 Surveillance:** Capture real-time screenshots and webcam photos remotely.
-*   **📁 DropZone:** Dedicated file transfer hub to upload/download files between PC and Mobile.
-*   **🎙️ Voice & TTS:** Send text to be spoken by the PC or record remote audio clips.
-*   **⚡ System Actions:** Control volume, brightness, power (shutdown/sleep), and monitor status.
-*   **📊 Task Manager:** View running processes and kill them remotely if needed.
-*   **🌐 mDNS Support:** Connect easily via `sudarshan.local` without typing IP addresses.
-*   **🛡️ Secure Access:** Persistent PIN-based authentication for all remote actions.
+---
+
+## 🛠 Feature Suite
+
+### 📱 HID & System Control
+*   **Smart Input:** Precision mouse movement, scrolling, and remote keyboard typing via your mobile browser.[cite: 1, 2]
+*   **Instant Shortcuts:** One-tap Alt-Tab, Task Manager access, and desktop window toggling.[cite: 1, 2]
+*   **Media Center:** Full control over playback and volume for Spotify, YouTube, VLC, and Netflix.[cite: 1, 2]
+
+### 📸 Pro Surveillance
+*   **Live Stream:** View your PC screen frame-by-frame directly on your smartphone.[cite: 1, 2]
+*   **Webcam Capture:** Snap high-quality remote photos using OpenCV or native Windows drivers.[cite: 1, 2]
+*   **Stealth Screenshots:** Capture and save full-resolution PC screenshots directly to your device.[cite: 1, 2]
+
+### 📁 Data & Automation
+*   **DropZone:** A dedicated desktop folder for instant, drag-and-drop file transfers between PC and Mobile.[cite: 1, 2]
+*   **Clipboard Bridge:** Sync your clipboard to copy text on your phone and paste it directly on your PC.[cite: 1, 2]
+*   **Process Switcher:** Real-time process monitoring with a remote "Kill" switch for frozen applications.[cite: 1, 2]
+*   **Voice & TTS:** Make your PC speak any text or record remote environment audio as `.wav` files.[cite: 1, 2]
+
+---
 
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="https://via.placeholder.com/400x250?text=Web+Dashboard+UI" alt="Dashboard" width="400">
-  <img src="https://via.placeholder.com/400x250?text=QR+Code+Startup" alt="QR Interface" width="400">
-  <p><i>Sudarshan Pro uses a sleek, glassmorphic UI for a professional SaaS feel.</i></p>
+  <img src="https://via.placeholder.com/600x350?text=Sudarshan+Pro+Mobile+Dashboard+UI" alt="Dashboard" width="600">
+  <br>
+  <i>Experience a sleek, modern Glassmorphic interface designed for maximum productivity.</i>
 </div>
 
-## 🛠️ Technologies Used
+---
 
-*   **Backend:** Python 3 with Flask & Waitress (Production-grade WSGI).
-*   **Automation:** `PyAutoGUI` for HID control and `psutil` for system monitoring.
-*   **Connectivity:** `Zeroconf` (mDNS) and `qrcode` for easy pairing.
-*   **GUI:** `Tkinter` and `Pillow` for the local PC dashboard.
+## 🚀 Installation & Setup
 
-## 🚀 Getting Started
+### 📦 Portable Execution (Fastest)
+1.  **Download** the `SudarshanPro.exe` using the badge at the top or this [Direct Link](https://drive.google.com/file/d/1PtmbLT0mRky7qzX1UMUDUjovTk7V5yRV/view?usp=sharing).
+2.  **Launch** the file `remotepc.py` (or the compiled exe).[cite: 1, 2]
+3.  **Firewall Configuration:** When prompted by Windows, **MUST** check both 🔳 **Private** and 🔳 **Public** networks to ensure mobile connectivity.
+4.  **Connect:** Scan the QR code that appears on your PC and enter your secure 4-digit PIN.[cite: 1, 2]
 
-### Installation (Portable EXE)
-1.  **Download** the latest `SudarshanPro.exe` from the [Releases](https://github.com/JaiServanaBhava/SudarshanPro/releases) page.
-2.  **Run** the file. 
-3.  **Firewall Setup:** 
-    *   When the Windows Firewall prompt appears, ensure **both** "Private" and "Public" networks are checked to allow the phone to communicate with the PC.
-4.  **Scan the QR code** that appears on your PC screen with your phone.
-
-### Run from Source
+### 💻 Developer Mode
 ```bash
-pip install flask waitress psutil pyautogui pyperclip qrcode zeroconf pillow opencv-python
-python main.py
+# Clone the repository
+git clone [https://github.com/JaiServanaBhava/SudarshanPro.git](https://github.com/JaiServanaBhava/SudarshanPro.git)
+cd SudarshanPro
+
+# Install dependencies
+pip install flask waitress psutil pyautogui pyperclip qrcode zeroconf pillow opencv-python pyaudio pyttsx3
+
+# Run the controller
+python remotepc.py
