@@ -21,6 +21,7 @@
   <h4>
     <a href="#-key-advantages">Advantages</a> •
     <a href="#-feature-suite">Features</a> •
+    <a href="#-screenshots">Screenshots</a> •
     <a href="#-installation">Installation</a> •
     <a href="#-tech-stack">Tech Stack</a>
   </h4>
@@ -62,11 +63,19 @@ Traditional remote desktop tools are often heavy, laggy, or require complex port
 ---
 
 ## 📸 Screenshots
+*Insert your project screenshots here to showcase the sleek UI.*
 
 <div align="center">
-  <img src="https://via.placeholder.com/600x350?text=Sudarshan+Pro+Mobile+Dashboard+UI" alt="Dashboard" width="600">
-  <br>
-  <i>Experience a sleek, modern Glassmorphic interface designed for maximum productivity.</i>
+  <table style="border: none;">
+    <tr>
+      <td><img src="YOUR_DASHBOARD_URL_HERE" alt="Dashboard" width="250"></td>
+      <td><img src="YOUR_REMOTE_VIEW_URL_HERE" alt="Remote View" width="250"></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Mobile Dashboard</b></td>
+      <td align="center"><b>Surveillance View</b></td>
+    </tr>
+  </table>
 </div>
 
 ---
@@ -74,10 +83,13 @@ Traditional remote desktop tools are often heavy, laggy, or require complex port
 ## 🚀 Installation & Setup
 
 ### 📦 Portable Execution (Fastest)
-1.  **Download** the `SudarshanPro.exe` using the badge at the top or this [Direct Link](https://drive.google.com/file/d/1PtmbLT0mRky7qzX1UMUDUjovTk7V5yRV/view?usp=sharing).
-2.  **Launch** the file `remotepc.py` (or the compiled exe).[cite: 1, 2]
-3.  **Firewall Configuration:** When prompted by Windows, **MUST** check both 🔳 **Private** and 🔳 **Public** networks to ensure mobile connectivity.
-4.  **Connect:** Scan the QR code that appears on your PC and enter your secure 4-digit PIN.[cite: 1, 2]
+1.  **Download:** Get the `SudarshanPro.exe` using the badge at the top or this [Direct Link](https://drive.google.com/file/d/1PtmbLT0mRky7qzX1UMUDUjovTk7V5yRV/view?usp=sharing).
+2.  **Launch:** Open the executable file.[cite: 1, 2]
+3.  **Firewall Configuration:** When prompted by Windows, you **MUST** check both 🔳 **Private** and 🔳 **Public** networks to allow your phone to talk to your PC.
+4.  **Connect:** Scan the QR code on your PC screen with your phone.[cite: 1, 2]
+5.  **Authentication:** 
+    *   The **default security PIN** is `1234`.[cite: 1, 2]
+    *   *Note: You can update this PIN to a custom value later in the settings menu for enhanced security.*[cite: 1, 2]
 
 ### 💻 Developer Mode
 ```bash
