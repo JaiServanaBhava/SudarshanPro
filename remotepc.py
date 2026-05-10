@@ -16,9 +16,6 @@ import tkinter as tk
 from PIL import ImageTk, Image
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
-# ─────────────────────────────────────────────
-# PYINSTALLER PATH FIX
-# ─────────────────────────────────────────────
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
@@ -26,9 +23,6 @@ def resource_path(relative_path):
         base_path = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_path, relative_path)
 
-# ─────────────────────────────────────────────
-# CONFIG FILE  (PIN persistence)
-# ─────────────────────────────────────────────
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sudarshan_pro_config.json")
 
 def load_config():
@@ -47,9 +41,6 @@ def save_config(cfg):
 
 config = load_config()
 
-# ─────────────────────────────────────────────
-# FLASK APP
-# ─────────────────────────────────────────────
 app = Flask(__name__,
             template_folder=resource_path("templates"),
             static_folder=resource_path("static"))
@@ -70,11 +61,7 @@ try:
 except ImportError:
     sbc = None
 
-# ─────────────────────────────────────────────
-# TTS  —  Fixed: new engine per call (avoids "one time only" bug)
-#          Runs in a thread with a semaphore so calls don't overlap.
-# ─────────────────────────────────────────────
-_tts_sem = threading.Semaphore(1)   # only 1 speech at a time
+_tts_sem = threading.Semaphore(1)  
 
 def _speak_worker(text):
     """Runs in a daemon thread. Creates a fresh pyttsx3 engine every call."""
@@ -97,18 +84,12 @@ def speak_async(text):
     if text:
         threading.Thread(target=_speak_worker, args=(text,), daemon=True).start()
 
-# ─────────────────────────────────────────────
-# DROP ZONE
-# ─────────────────────────────────────────────
 try:
     DROP_ZONE_PATH = os.path.normpath(os.path.join(os.path.expanduser("~"), "Desktop", "DropZone"))
     os.makedirs(DROP_ZONE_PATH, exist_ok=True)
 except Exception:
     DROP_ZONE_PATH = "C:\\"
 
-# ─────────────────────────────────────────────
-# MUTE OLD PROCESS
-# ─────────────────────────────────────────────
 def kill_port_owner(port):
     current_pid = os.getpid()
     try:
@@ -121,9 +102,6 @@ def kill_port_owner(port):
     except Exception:
         pass
 
-# ─────────────────────────────────────────────
-# mDNS / ZEROCONF  →  sudarshan.local
-# ─────────────────────────────────────────────
 def start_mdns(local_ip, port=5000):
     """Advertise sudarshan.local so phones can reach the PC by name."""
     try:
@@ -145,12 +123,8 @@ def start_mdns(local_ip, port=5000):
     except Exception as e:
         print(f"mDNS error: {e}")
 
-# ─────────────────────────────────────────────
-# PIN ROUTES
-# ─────────────────────────────────────────────
 @app.route('/get_pin_check', methods=['POST'])
 def get_pin_check():
-    """Client sends entered PIN; server validates it."""
     try:
         entered = str(request.json.get('pin', ''))
         correct = config.get('pin', '1234')
@@ -160,7 +134,6 @@ def get_pin_check():
 
 @app.route('/change_pin', methods=['POST'])
 def change_pin():
-    """Change PIN. Requires old PIN + new PIN."""
     try:
         data = request.json or {}
         old_pin = str(data.get('old_pin', ''))
@@ -174,10 +147,6 @@ def change_pin():
         return jsonify({"status": "PIN changed successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# ─────────────────────────────────────────────
-# ALL ORIGINAL ROUTES  (unchanged logic, kept fast)
-# ─────────────────────────────────────────────
 
 @app.route('/app_status')
 def check_apps():
@@ -288,7 +257,7 @@ def get_status():
             "os": platform.system(),
             "battery": f"{battery.percent:.0f}%" if battery else "N/A",
             "charging": battery.power_plugged if battery else False,
-            "cpu": psutil.cpu_percent(interval=None),   # non-blocking
+            "cpu": psutil.cpu_percent(interval=None),
             "ram": psutil.virtual_memory().percent
         })
     except Exception:
@@ -321,20 +290,12 @@ def handle_speak():
 
 @app.route('/capture_cam', methods=['POST'])
 def capture_cam():
-    """
-    Capture a photo from the webcam.
-    Priority order:
-      1. opencv-python  (best quality, optional install)
-      2. PowerShell WIA (Windows built-in, no extra install)
-      3. Friendly error with install hint
-    """
     filename = f"capture_{int(time.time())}.jpg"
     filepath = os.path.join(DROP_ZONE_PATH, filename)
 
-    # ── Method 1: OpenCV (optional, best quality) ──────────────────────
     try:
-        import cv2  # noqa: F401 – only imported here
-        cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # CAP_DSHOW avoids WDM conflicts on Windows
+        import cv2  
+        cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         if not cam.isOpened():
             cam.release()
             raise RuntimeError("Camera busy or not found via OpenCV")
@@ -658,14 +619,8 @@ def media_control():
 
 @app.route('/record_audio', methods=['POST'])
 def record_audio():
-    """
-    Record audio from the default microphone.
-    Accepts optional JSON field 'duration' (seconds, default 30, max 120).
-    Uses pyaudio if available; returns a clear error if not installed.
-    """
     try:
         data = request.get_json(silent=True) or {}
-        # Allow caller to specify duration; clamp to sane limits
         requested_secs = int(data.get('duration', 30))
         RECORD_SECONDS = max(3, min(120, requested_secs))
 
@@ -961,9 +916,6 @@ def download_file_path():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ─────────────────────────────────────────────
-# STARTUP QR WINDOW
-# ─────────────────────────────────────────────
 def show_startup_qr(local_ip, port=5000):
     try:
         url = f"http://{local_ip}:{port}"
@@ -1022,9 +974,6 @@ def show_startup_qr(local_ip, port=5000):
     except Exception as e:
         print(f"GUI Error: {e}")
 
-# ─────────────────────────────────────────────
-# MAIN
-# ─────────────────────────────────────────────
 def get_local_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1038,10 +987,7 @@ def get_local_ip():
 if __name__ == '__main__':
     try:
         kill_port_owner(5000)
-
         local_ip = get_local_ip()
-
-        # Start mDNS so "sudarshan.local" works on the network
         threading.Thread(target=start_mdns, args=(local_ip,), daemon=True).start()
 
         def run_server():
@@ -1049,12 +995,8 @@ if __name__ == '__main__':
                 serve(app, host='0.0.0.0', port=5000, threads=16)
             except Exception as e:
                 print(f"Server Error: {e}")
-
         threading.Thread(target=run_server, daemon=True).start()
-
-        # Show QR window (main thread)
         show_startup_qr(local_ip)
-
     except KeyboardInterrupt:
         sys.exit(0)
     except Exception as e:
