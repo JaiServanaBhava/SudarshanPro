@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/UI-Glassmorphism-brightgreen?style=for-the-badge" alt="UI">
   </p>
 
-  <a href="https://drive.google.com/file/d/1PtmbLT0mRky7qzX1UMUDUjovTk7V5yRV/view?usp=sharing">
+  <a href="https://github.com/JaiServanaBhava/SudarshanPro/releases/download/V1.0/SudarshanPro.exe">
     <img src="https://img.shields.io/badge/DOWNLOAD-SUDARSHAN_PRO_EXE-blueviolet?style=for-the-badge&logo=google-drive&logoColor=white" alt="Download EXE">
   </a>
 
